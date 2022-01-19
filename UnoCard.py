@@ -6,9 +6,9 @@ class UnoCard:
         self.number = number
         self.special = special
     def __eq__(self, __o: object) -> bool:
-        ## If card is of the same color or same number or is special is eligable
+        ## If card is of the same color or same number or is special or is None is eligable
         ## TODO: Check this logic later
-        if (__o.color != None and __o.color == self.color) or (__o.number != None and __o.number == self.number) or (__o.special != None):
+        if (__o == None) or (__o.color != None and __o.color == self.color) or (__o.number != None and __o.number == self.number) or (__o.special != None):
             return True
         return False
     def __str__(self) -> str:

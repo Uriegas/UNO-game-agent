@@ -47,3 +47,4 @@ Your turn >
 
 # TODO
 At the moment the code is fixed to work only for 2 players, it would be desirable to make the code work with multiplayers
+Special powers aren't implemented yet.
