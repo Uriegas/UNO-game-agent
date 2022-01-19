@@ -5,6 +5,8 @@ class UnoCard:
         self.color = color
         self.number = number
         self.special = special
+    def setColor(self, color: Color) -> None:
+        self.color = color
     def __eq__(self, __o: object) -> bool:
         ## If card is of the same color or same number or is special or is None is eligable
         ## TODO: Check this logic later
