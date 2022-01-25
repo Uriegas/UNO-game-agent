@@ -5,6 +5,13 @@ An agent that plays the UNO game
 Uno deck based on ![](UNO_deck.png)
 
 # Running the code
+Execute with:
+```
+python UNO.py
+```
+To start 2 player UNO game.
+
+
 Expected output:
 ```
 [uriegas@Dell UNO-game-agent]$ python UNO.py
@@ -16,33 +23,22 @@ Expected output:
 | | | || \| | / _ \  Welcome to UNO GAME from terminal.
 | |_| || .` || (_) | You are playing against a machine.
  \___/ |_|\_| \___/  
-                     
 
-Machine cards{
-    UnoCard{ color: yellow, special: blockNextPlayer }
-    UnoCard{ color: green, number: 3 }
-    UnoCard{ color: blue, special: reverse }
-    UnoCard{ color: red, special: plusFour }
-    UnoCard{ color: red, number: 1 }
-    UnoCard{ color: yellow, number: 0 }
-    UnoCard{ color: green, number: 5 }
-    UnoCard{ color: green, number: 8 }
+Eduardo{
+        id: 712,
+        cards{
+                UnoCard{ color: red,    special: colorChange }
+                UnoCard{ color: red,    number: 8 }
+                UnoCard{ color: blue,   number: 1 }
+                UnoCard{ color: blue,   number: 6 }
+                UnoCard{ color: blue,   number: 1 }
+                UnoCard{ color: red,    number: 9 }
+                UnoCard{ color: red,    number: 6 }
+                UnoCard{ color: green,  number: 7 }
+        }
 }
-
-Your cards{
-    UnoCard{ color: green, number: 0 }
-    UnoCard{ color: red, special: plusTwo }
-    UnoCard{ color: blue, number: 6 }
-    UnoCard{ color: red, special: blockNextPlayer }
-    UnoCard{ color: yellow, number: 4 }
-    UnoCard{ color: yellow, special: reverse }
-    UnoCard{ color: yellow, special: plusTwo }
-    UnoCard{ color: green, number: 1 }
-}
-
-Current card: UnoCard{ color: green, number: 1 }
-
-Your turn > 
+Current card is: None
+Insert the number of your selection (Type '?' for help)>
 ```
 
 # TODO
