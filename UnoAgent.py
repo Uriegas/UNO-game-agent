@@ -1,12 +1,12 @@
 from typing import List, Tuple
-from xmlrpc.client import Boolean
 from UnoCard import UnoCard
 import random
+from Utilities import *
 
-DIFFICULTY = 1 # Hardcoded difficulty
+DIFFICULTY = 0 # Hardcoded difficulty
 
 class UnoAgent:
-    def __init__(self, id: int, name: str, isBot: Boolean, cards: List ) -> None:
+    def __init__(self, id: int, name: str, isBot: bool, cards: List ) -> None:
         self.id = id
         self.name = name
         self.isBot = isBot
@@ -78,7 +78,7 @@ class UnoAgent:
         seq = cardStack ## Sequence of cards
         actions = self.getActions(cardStack[-1], self.cards) ## Actions of the agent: list of indexes
         if actions != []: ## If there are actions that can be performed
-            return self.cards.pop(self.getAction(actions)) ## Return the selected card
+            return self.cards.pop(self.getAction(actions, cardStack)) ## Return the selected card
         else: ## Since there are no possible actions eat a card
             return None
     
@@ -88,32 +88,75 @@ class UnoAgent:
         '''
         actions = []
         for i in range(len(cards)):
-            if currentCard == cards[i]:
+            if cards[i] == currentCard:
                 actions.append(i)
         return actions
     
-    def getAction(self, actions: List) -> int:
+    def getAction(self, actions: List, cardStack: List ) -> int:
         '''
         Returns the index of the selected card
         '''
         if self.difficulty == 0:
-            return random.choice(actions)
+            return self.getActionEasy(actions)
         elif self.difficulty == 1:
-            return self.getActionMedium(actions)
-        elif self.difficulty == 2:
-            return self.getActionHard(actions)
-        else:
+            return self.getActionMedium(actions, cardStack)
+        else: ## Should never execute
             print("Invalid difficulty")
             return None
     
-    def getActionMedium(self, actions: List) -> int:
+    def getActionEasy(self, actions: List) -> int:
+        '''
+        Returns the index of the selected card
+        '''
+        return random.choice(actions)
+    
+    def getActionMedium(self, actions: List, cardStack: List) -> int:
         '''
         Returns the index of the selected card
         '''
         if len(actions) == 1:
             return actions[0]
         else:
-            return random.choice(actions)
+            actionsCards = []
+            for action in actions:
+                actionsCards.append(self.cards[action])
+            # Count how many cards of each color there are in the stack
+            colorsCounter = [0, 0, 0, 0] # Red, Blue, Green, Yellow
+            for card in self.cards:
+                if card.color == Color.red:
+                    colorsCounter[0] += 1
+                elif card.color == Color.blue:
+                    colorsCounter[1] += 1
+                elif card.color == Color.green:
+                    colorsCounter[2] += 1
+                elif card.color == Color.yellow:
+                    colorsCounter[3] += 1
+
+            # Special cards have more weight
+            actionsWeight = []
+            for action in actionsCards:
+                actionsWeight.append(0)
+                if action.special is not None:
+                    if action.special == Special.plusFour or action.special == Special.colorChange:
+                        actionsWeight[-1] += 2
+                    if action.special == Special.plusTwo:
+                        actionsWeight[-1] += 1
+                    if action.special == Special.reverse or action.special == Special.blockNextPlayer:
+                        actionsWeight[-1] += 0.5
+                ## The greater the cards of a color in the stack, the more weight it has
+                ## Because is less probable that other players have a color that has been already played
+                if action.color == Color.red:
+                    actionsWeight[-1] += colorsCounter[0] / 25
+                elif action.color == Color.blue:
+                    actionsWeight[-1] += colorsCounter[1] / 25
+                elif action.color == Color.green:
+                    actionsWeight[-1] += colorsCounter[2] / 25
+                elif action.color == Color.yellow:
+                    actionsWeight[-1] += colorsCounter[3] / 25
+            
+            maxAction = max(actionsWeight)
+            # Find index of max weight
+            return actions[actionsWeight.index(maxAction)]
     
     def selectColor(self, cardStack: List) -> str:
         '''
@@ -122,5 +165,23 @@ class UnoAgent:
         Note: At the moment this function only handles if self.isBot is True
         but in the future it should handle both cases and the function should return a Color
         selectColor(self, cardStack: List) -> Color
+
+        Note: There is misleading counting here since the special cards had a random color value
         '''
-        return random.choice(["red", "blue", "green", "yellow"])
+        colors = ["red", "blue", "green", "yellow"]
+        if self.difficulty == 0:
+            return random.choice(colors)
+        elif self.difficulty == 1:
+            colorsCounter = [0, 0, 0, 0]
+            for card in cardStack:
+                if card.color == Color.red:
+                    colorsCounter[0] += 1
+                elif card.color == Color.blue:
+                    colorsCounter[1] += 1
+                elif card.color == Color.green:
+                    colorsCounter[2] += 1
+                elif card.color == Color.yellow:
+                    colorsCounter[3] += 1
+            maxColor = max(colorsCounter)
+            ## Find index of max color
+            return colors[colorsCounter.index(maxColor)]
