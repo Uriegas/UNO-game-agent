@@ -28,9 +28,10 @@ class UnoGame:
         print("| | | || \| | / _ \  Welcome to UNO GAME from terminal.")
         print("| |_| || .` || (_) | You are playing against a machine.")
         print(" \___/ |_|\_| \___/\n")
-        while self.winner is None:
-            print(self.players[0]) # Verbose
+        while self.winner is None or len(self.deck) > 0:
             self.play() ## In special cards we change the players array inside the board method call.
+            if self.players[0].cards == []: ## If the player has no cards left, he's the winner
+                self.winner = self.players[0]
             self.players.append( self.players.pop(0) ) ## This is the change of player turn
         self.printWinner()
 
@@ -41,6 +42,7 @@ class UnoGame:
         card = player.action(self.cardStack) ## TODO: Add more parameters to this function
         if card is not None:
             self.cardStack.append(card) ## Add card to the stack
+            print(player.name + " selected card: " + str(card))
             if card.special is not None: ## Is a special action
                 if card.special == Special.plusTwo:
                     self.requestAdd(2)
@@ -62,14 +64,26 @@ class UnoGame:
 
 
     def printWinner(self) -> None:
-        print("The winner is: " + self.winner.name)
+        if self.winner is None:
+            print("Draw: There is no winner")
+        else:
+            print("The winner is: " + self.winner.name)
         print("Chika chika yeah!")
     
     def colorChangePrompt(self) -> None:
+        """
+        TODO: Change this function so that I have something like
+        selection = self.players[0].selectColor(self.cardStack) -> Color
+
+        It should return the color and the IO should be hidden in the UnoAgent class
+        """
         ## The color of the special card changes to the selected one
         currentCard = self.cardStack[-1]
         while True: ## Ugliest code ever
-            selection = input("Choose new color (red, green, blue, yellow)> ")
+            if self.players[0].isBot:
+                selection = self.players[0].selectColor(self.cardStack)
+            else:
+                selection = input("Choose new color (red, green, blue, yellow)> ")
             if selection == "red":
                 currentCard.setColor( Color.red )
                 break
@@ -84,6 +98,7 @@ class UnoGame:
                 break
             else:
                 print("Invalid color, please type a valid one.")
+        print(self.players[0].name + " selected color: " + str(currentCard.color))
     
     def __str__(self) -> str:
         string = "UNO GAME\n"
@@ -99,7 +114,8 @@ class UnoGame:
     def requestAdd(self, number: int) -> None:
         ## The current player requests to add a number of cards to the next player
         nextPlayer = self.players[1] ## Guaranteed that there at list 2 players
-        nextPlayer.addCard(self.deck.pop() for i in range(number))
+        for i in range(number):
+            nextPlayer.addCard( self.deck.pop() )
         ## This is faster than using pop()
         # selectedCards = self.deck[-number:]
         # del self.deck[-number:]
